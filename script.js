@@ -84,23 +84,6 @@ class Inventory {
         }
     }
 
-    insert(pos, product) {
-        pos--;
-        let space = [];
-            if(pos+1 == this.registry.length) {
-                this.registry.push(product);
-            } else {
-                for(let i = 0; i < pos; i++) {
-                    space.push(this.registry[i]);
-                }
-                space.push(product);
-                for(let i = pos; i < this.registry.length; i++) {
-                    space.push(this.registry[i]);
-                }                
-            this.registry = space;
-            }
-    }
-
     _findByCode(code) {
         for(let i = 0; i < this.registry.length; i++) {
             if(code === this.registry[i].getCode()) {
@@ -110,9 +93,24 @@ class Inventory {
         return null;
     }
 
+    organize() {
+        let pos = this.registry.length - 1;
+        for(let i = 0; i < this.registry.length; i++) {
+            if(this.registry[pos].getCode() < this.registry[i].getCode()) {
+                let space = this.registry[pos];
+                this.registry[pos] = this.registry[i];
+                this.registry[i] = space;
+            }
+        }
+    }
+
 }
 
 let inventory1 = new Inventory();
+
+function cleanHTML() {
+    return `<p> </p>`;
+}
 
 let btnAdd = document.getElementById('btnAdd');
 btnAdd.addEventListener('click', () => {
@@ -126,6 +124,7 @@ btnAdd.addEventListener('click', () => {
         document.getElementById('details').innerHTML =
         `<p>El producto ${product.getProductName()} se agregó correctamente</p>`
         console.log(inventory1.registry);
+        inventory1.organize();
     } else {
         document.getElementById('details').innerHTML =
         `<p>El inventario está lleno</p>`
@@ -149,11 +148,15 @@ btnSearch.addEventListener('click', () => {
 
 let btnListAll = document.getElementById('btnListAll');
 btnListAll.addEventListener('click', () => {
+    let details = document.getElementById('details');
+    details.innerHTML = this.cleanHTML();
     inventory1.listAll();
 });
 
 let btnListAllInverted = document.getElementById('btnListInvert');
 btnListAllInverted.addEventListener('click', () => {
+    let details = document.getElementById('details');
+    details.innerHTML = this.cleanHTML();
     inventory1.listAllInverted();
 });
 
@@ -170,28 +173,4 @@ btnDelete.addEventListener('click', () => {
         `<div class="card"> <p>Producto ${productDeleted.getProductName()} eliminado correctamente</p>`, '</div>';
         console.log(inventory1.getArray());
     }
-});
-
-let btnInsert = document.getElementById('btnInsert');
-btnInsert.addEventListener('click', () => {
-    let position = document.getElementById('txtPosSearch').value;
-
-    let code = document.getElementById('txtCode').value;
-    let name = document.getElementById('txtName').value;
-    let quantity = document.getElementById('txtQuantity').value;
-    let cost = document.getElementById('txtCost').value;
-
-    let product = new Product(code, name, quantity, cost);
-
-    if(position <= inventory1.getArray().length) {
-        inventory1.insert(position, product);
-        document.getElementById('details').innerHTML =
-        `<p>El producto ${product.getProductName()} se agregó correctamente en la posición ${position}</p>`
-    } else {
-        document.getElementById('details').innerHTML =
-        `<p>El producto no se puede agregar en esa posición</p>`
-    }
-
-    console.log(inventory1.getArray());
-    
 });
